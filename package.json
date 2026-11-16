@@ -1,0 +1,12 @@
+{
+  "name": "gol-duellosu",
+  "version": "1.0.0",
+  "description": "Telefonda oynanan, sesli sohbetli online gol düellosu",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

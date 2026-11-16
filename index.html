@@ -1,0 +1,389 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Gol Düellosu</title>
+<style>
+:root{--ac:#ffd23f;--tx:#f4fff6;--mut:#9cc7aa;--card:rgba(255,255,255,.08)}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0}
+body{background:radial-gradient(circle at 50% 0,#1f6a3d,#0b1f14 70%);color:var(--tx);font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;min-height:100dvh}
+.screen{display:none;padding:16px 16px 90px;max-width:480px;margin:0 auto}
+.screen.on{display:block}
+h1{text-align:center;font-size:30px;margin:18px 0 4px}
+.sub{text-align:center;color:var(--mut);margin:0 0 20px}
+.card{background:var(--card);border-radius:16px;padding:14px;margin-bottom:12px}
+input{width:100%;padding:14px;border-radius:12px;border:2px solid transparent;background:#fff;color:#111;font-size:18px;margin-bottom:10px}
+input:focus{outline:none;border-color:var(--ac)}
+button{font:inherit;font-weight:700;border:0;border-radius:14px;padding:14px 18px;font-size:18px;background:var(--ac);color:#222;width:100%;cursor:pointer}
+button.sec{background:rgba(255,255,255,.14);color:var(--tx)}
+button:disabled{opacity:.4}
+.or{text-align:center;color:var(--mut);margin:10px 0}
+.code{font-size:54px;letter-spacing:10px;text-align:center;font-weight:900;color:var(--ac)}
+.plist{list-style:none;padding:0;margin:0}
+.plist li{padding:10px 12px;border-radius:10px;background:rgba(255,255,255,.07);margin-bottom:6px;display:flex;justify-content:space-between}
+.hint{color:var(--mut);font-size:14px;text-align:center}
+.top{display:flex;justify-content:space-between;align-items:center;font-weight:700;margin-bottom:6px}
+.bar{height:8px;background:rgba(255,255,255,.15);border-radius:6px;overflow:hidden;margin-bottom:10px}
+.bar i{display:block;height:100%;width:100%;background:var(--ac)}
+.scores{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-bottom:8px}
+.chip{background:rgba(255,255,255,.1);border-radius:20px;padding:5px 12px;font-size:14px;display:flex;gap:8px;border:2px solid transparent}
+.chip.sh{border-color:var(--ac)}
+.chip.kp{border-color:#5ec8ff}
+.chip span{color:var(--ac);font-weight:900}
+.role{text-align:center;font-size:18px;font-weight:700;min-height:48px;margin:4px 0}
+.field{position:relative;margin:34px 6px 90px}
+.goal{position:relative;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(2,1fr);aspect-ratio:3/2;border:5px solid #fff;border-bottom:0;background:repeating-linear-gradient(45deg,rgba(255,255,255,.06) 0 6px,transparent 6px 12px)}
+.cell{border:1px dashed rgba(255,255,255,.3);transition:background .15s}
+.cell.aim{background:rgba(255,210,63,.45)}
+.cell.shot{background:rgba(255,80,80,.35)}
+.cell.kp{outline:3px solid #5ec8ff;outline-offset:-3px}
+.ball,.keeper{position:absolute;transform:translate(-50%,-50%);font-size:34px;pointer-events:none;transition:left .7s ease-out,top .7s ease-out}
+.keeper{font-size:42px}
+.grass{position:absolute;left:-6px;right:-6px;top:100%;height:80px;background:linear-gradient(#2f8f4e,transparent);border-top:3px solid #fff;opacity:.5}
+.meter{position:relative;height:26px;border-radius:13px;background:linear-gradient(90deg,#f5b700 0 55%,#2ecc71 55% 88%,#e74c3c 88% 100%);margin:10px 0 4px;overflow:hidden}
+.meter i{position:absolute;top:0;bottom:0;width:6px;background:#fff;box-shadow:0 0 6px #000;left:0}
+.legend{display:flex;justify-content:space-between;font-size:11px;color:var(--mut);margin-bottom:10px}
+.banner{text-align:center;font-size:22px;font-weight:900;min-height:60px;margin-top:6px}
+.rank li b{margin-right:8px}
+#micbtn{position:fixed;right:14px;bottom:14px;width:auto;padding:12px 16px;font-size:15px;z-index:5;background:#fff;color:#222}
+#micbtn.off{background:#ff5a5a;color:#fff}
+#toast{position:fixed;left:50%;top:14px;transform:translateX(-50%);background:#000c;padding:10px 16px;border-radius:10px;display:none;z-index:9}
+</style>
+</head>
+<body>
+
+<div id="toast"></div>
+
+<!-- ANA EKRAN -->
+<div class="screen on" id="s-home">
+  <h1>⚽ Gol Düellosu</h1>
+  <p class="sub">Biri şut çeker, biri kalede. Sesli sohbetle oyna.</p>
+  <div class="card">
+    <input id="name" placeholder="Adın" maxlength="14" autocomplete="off">
+    <button id="btn-create">Yeni oda kur</button>
+    <button id="btn-solo" class="sec" style="margin-top:10px">🤖 Bilgisayara karşı oyna</button>
+    <div class="or">veya</div>
+    <input id="code" placeholder="Oda kodu (ABCD)" maxlength="4" autocapitalize="characters" autocomplete="off">
+    <button id="btn-join" class="sec">Odaya katıl</button>
+  </div>
+  <p class="hint">Katılırken mikrofon izni istenir. İzin verirsen herkesle sesli konuşabilirsin.</p>
+</div>
+
+<!-- LOBİ -->
+<div class="screen" id="s-lobby">
+  <h1>Bekleme odası</h1>
+  <div class="card">
+    <div class="hint">Oda kodu</div>
+    <div class="code" id="l-code">----</div>
+    <button class="sec" id="btn-share" style="margin-top:10px">🔗 Davet linkini paylaş</button>
+  </div>
+  <div class="card"><ul class="plist" id="l-players"></ul></div>
+  <div id="l-bots" style="display:none;gap:8px;margin-bottom:10px">
+    <button class="sec" id="btn-addbot">🤖 Bot ekle</button>
+    <button class="sec" id="btn-delbot">Bot çıkar</button>
+  </div>
+  <button id="btn-start">Oyunu başlat</button>
+  <p class="hint" id="l-wait"></p>
+  <p class="hint">2–6 kişi oynayabilir. Herkes iki kez şut çeker, iki kez de kalede durur.</p>
+</div>
+
+<!-- OYUN -->
+<div class="screen" id="s-game">
+  <div class="top"><div id="g-round"></div><div id="g-phase"></div></div>
+  <div class="bar"><i id="g-bar"></i></div>
+  <div class="scores" id="g-scores"></div>
+  <div class="role" id="g-role"></div>
+
+  <div class="field">
+    <div class="goal" id="goal">
+      <div class="cell" data-i="0"></div><div class="cell" data-i="1"></div><div class="cell" data-i="2"></div>
+      <div class="cell" data-i="3"></div><div class="cell" data-i="4"></div><div class="cell" data-i="5"></div>
+      <div class="keeper" id="keeper">🧤</div>
+      <div class="ball" id="ball">⚽</div>
+    </div>
+    <div class="grass"></div>
+  </div>
+
+  <div id="g-shootui" style="display:none">
+    <div class="meter"><i id="meter-i"></i></div>
+    <div class="legend"><span>yumuşak (kurtarılabilir)</span><span>sert (tam isabet)</span><span>aut</span></div>
+  </div>
+  <button id="btn-act" style="display:none"></button>
+  <div class="banner" id="g-banner"></div>
+</div>
+
+<!-- BİTİŞ -->
+<div class="screen" id="s-over">
+  <h1>🏆 Maç bitti</h1>
+  <div class="card"><ul class="plist rank" id="o-rank"></ul></div>
+  <button id="btn-again">Tekrar oyna</button>
+</div>
+
+<button id="micbtn" style="display:none">🎙️ Açık</button>
+
+<script>
+const $ = (s) => document.querySelector(s);
+const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+let S = null, me = null, room = null, es = null, localStream = null;
+let aim = null, submitted = false, lastKey = '', recvAt = 0, meterVal = 0;
+
+async function api(path, body) {
+  try {
+    const r = await fetch('/api/' + path, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+    return await r.json();
+  } catch (e) { return { error: 'Sunucuya ulaşılamadı' }; }
+}
+function toast(t) { const el = $('#toast'); el.textContent = t; el.style.display = 'block'; setTimeout(() => (el.style.display = 'none'), 2600); }
+function show(id) { document.querySelectorAll('.screen').forEach((s) => s.classList.toggle('on', s.id === id)); }
+
+/* ---------- Giriş ---------- */
+const qs = new URLSearchParams(location.search);
+if (qs.get('oda')) $('#code').value = qs.get('oda').toUpperCase().slice(0, 4);
+$('#name').value = localStorage.getItem('gd-name') || '';
+
+let solo = false;
+async function enter(kind) {
+  const name = $('#name').value.trim() || 'Oyuncu';
+  localStorage.setItem('gd-name', name);
+  solo = kind === 'solo';
+  const btns = ['#btn-create', '#btn-join', '#btn-solo'];
+  btns.forEach((b) => ($(b).disabled = true));
+  if (!solo) await initMic();
+  const res = kind === 'join' ? await api('join', { name, room: $('#code').value.trim().toUpperCase() }) : await api('create', { name });
+  btns.forEach((b) => ($(b).disabled = false));
+  if (res.error) return toast(res.error);
+  room = res.room; me = res.pid;
+  if (solo) {
+    // 3 bot ekle (toplam 4 kişi) ve oyunu hemen başlat
+    for (let i = 0; i < 3; i++) await api('addbot', { room, pid: me });
+    await api('start', { room, pid: me });
+  }
+  connect();
+}
+$('#btn-create').onclick = () => enter('create');
+$('#btn-solo').onclick = () => enter('solo');
+$('#btn-join').onclick = () => { if ($('#code').value.trim().length < 4) return toast('4 harfli oda kodunu yaz'); enter('join'); };
+
+function connect() {
+  es = new EventSource(`/api/events?room=${room}&pid=${me}`);
+  es.addEventListener('state', (e) => { S = JSON.parse(e.data); recvAt = performance.now(); onState(); });
+  es.addEventListener('signal', (e) => onSignal(JSON.parse(e.data)));
+  es.onerror = () => { if (es.readyState === EventSource.CLOSED) { toast('Bağlantı koptu'); setTimeout(() => location.href = location.pathname, 1500); } };
+  $('#micbtn').style.display = solo ? 'none' : 'block';
+  updateMicBtn();
+}
+
+/* ---------- Durum ---------- */
+function onState() {
+  syncPeers();
+  if (S.phase === 'lobby') { show('s-lobby'); renderLobby(); lastKey = ''; return; }
+  if (S.phase === 'over') { show('s-over'); renderOver(); return; }
+  show('s-game');
+  const key = S.round + ':' + S.phase;
+  if (key !== lastKey) {
+    lastKey = key;
+    if (S.phase === 'play') startPlay(); else if (S.phase === 'reveal') doReveal();
+  }
+  renderGame();
+}
+
+function renderLobby() {
+  $('#l-code').textContent = S.room;
+  $('#l-players').innerHTML = S.players.map((p) => `<li><span>${esc(p.name)}${p.id === me ? ' (sen)' : ''}</span><span>${p.id === S.hostId ? '👑' : ''}${p.online ? '' : ' ⚠️'}</span></li>`).join('');
+  const host = S.hostId === me;
+  $('#l-bots').style.display = host ? 'flex' : 'none';
+  $('#btn-addbot').disabled = S.players.length >= 6;
+  $('#btn-delbot').disabled = !S.players.some((p) => p.bot);
+  $('#btn-start').style.display = host ? 'block' : 'none';
+  $('#btn-start').disabled = S.players.length < 2;
+  $('#l-wait').textContent = host ? (S.players.length < 2 ? 'Arkadaşlarının katılmasını bekle…' : `${S.players.length} kişi hazır`) : 'Oda kurucusunun başlatması bekleniyor…';
+}
+$('#btn-addbot').onclick = async () => { const r = await api('addbot', { room, pid: me }); if (r.error) toast(r.error); };
+$('#btn-delbot').onclick = () => api('delbot', { room, pid: me });
+$('#btn-start').onclick = async () => { const r = await api('start', { room, pid: me }); if (r.error) toast(r.error); };
+$('#btn-share').onclick = async () => {
+  const url = `${location.origin}/?oda=${S.room}`;
+  const text = `Gol Düellosu'na gel! Oda kodu: ${S.room}`;
+  try { if (navigator.share) { await navigator.share({ title: 'Gol Düellosu', text, url }); return; } } catch (e) { return; }
+  try { await navigator.clipboard.writeText(url); toast('Link kopyalandı'); } catch (e) { prompt('Linki kopyala:', url); }
+};
+
+function nameOf(id) { const p = S.players.find((x) => x.id === id); return p ? p.name : '?'; }
+
+function renderGame() {
+  $('#g-round').textContent = `Tur ${Math.min(S.round + 1, S.total)}/${S.total}`;
+  $('#g-phase').textContent = S.phase === 'play' ? 'Hamle zamanı' : 'Sonuç';
+  $('#g-scores').innerHTML = S.players.map((p) => `<div class="chip ${p.id === S.shooterId ? 'sh' : ''} ${p.id === S.keeperId ? 'kp' : ''}"><b>${esc(p.name)}</b><span>${p.score}</span></div>`).join('');
+  const isSh = S.shooterId === me, isKp = S.keeperId === me;
+  const sn = esc(nameOf(S.shooterId)), kn = esc(nameOf(S.keeperId));
+  let role;
+  if (S.phase === 'reveal') role = '';
+  else if (isSh) role = '⚽ Şutçusun! Köşeyi seç, gücü doğru anda yakala.';
+  else if (isKp) role = '🧤 Kalecisin! Nereye atlayacağını seç.';
+  else role = `⚽ ${sn} şut çekiyor, 🧤 ${kn} kalede.<br><small>Mikrofonu aç, tezahürat yap 📣</small>`;
+  $('#g-role').innerHTML = role;
+  const play = S.phase === 'play';
+  $('#g-shootui').style.display = play && isSh && !submitted ? 'block' : 'none';
+  const btn = $('#btn-act');
+  btn.style.display = play && (isSh || isKp) ? 'block' : 'none';
+  if (play && (isSh || isKp)) {
+    btn.textContent = submitted ? 'Hazır, rakip bekleniyor…' : isSh ? '⚽ ŞUT!' : '🧤 ATIL!';
+    btn.disabled = submitted || aim === null;
+  }
+  if (play && !isSh && !isKp) $('#g-banner').textContent = `${S.locked.shooter ? '✅' : '⏳'} Şutçu   ${S.locked.keeper ? '✅' : '⏳'} Kaleci`;
+  else if (play) $('#g-banner').textContent = '';
+}
+
+/* ---------- Saha ---------- */
+const colX = (c) => ((c * 2 + 1) / 6) * 100;
+const rowY = (r) => ((r * 2 + 1) / 4) * 100;
+function place(el, left, top, animate) {
+  el.style.transition = animate ? '' : 'none';
+  el.style.left = left + '%'; el.style.top = top + '%';
+  if (!animate) void el.offsetWidth;
+}
+function startPlay() {
+  aim = null; submitted = false;
+  document.querySelectorAll('.cell').forEach((c) => (c.className = 'cell'));
+  place($('#ball'), 50, 135, false);
+  place($('#keeper'), 50, 55, false);
+  $('#g-banner').textContent = '';
+}
+document.querySelectorAll('.cell').forEach((c) => (c.onclick = () => {
+  if (!S || S.phase !== 'play' || submitted) return;
+  if (S.shooterId !== me && S.keeperId !== me) return;
+  aim = Number(c.dataset.i);
+  document.querySelectorAll('.cell').forEach((x) => x.classList.toggle('aim', x === c));
+  renderGame();
+}));
+$('#btn-act').onclick = async () => {
+  if (aim === null || submitted) return;
+  submitted = true;
+  const power = S.shooterId === me ? meterVal : 0;
+  renderGame();
+  const r = await api('pick', { room, pid: me, cell: aim, power });
+  if (!r.ok) { submitted = false; renderGame(); }
+};
+
+function doReveal() {
+  const R = S.result;
+  const kx = colX(R.keeperCell % 3), ky = rowY(Math.floor(R.keeperCell / 3));
+  const sx = colX(R.shotCell % 3), sy = rowY(Math.floor(R.shotCell / 3));
+  document.querySelectorAll('.cell').forEach((c, i) => { c.className = 'cell' + (i === R.shotCell ? ' shot' : '') + (i === R.keeperCell ? ' kp' : ''); });
+  place($('#keeper'), kx, ky, true);
+  if (R.outcome === 'miss') place($('#ball'), sx, -22, true);
+  else if (R.outcome === 'save') place($('#ball'), kx, ky, true);
+  else place($('#ball'), sx, sy, true);
+  const sn = esc(nameOf(R.shooterId)), kn = esc(nameOf(R.keeperId));
+  let t;
+  if (R.outcome === 'goal') t = `⚽ GOL!<br><small>${sn} attı</small>`;
+  else if (R.outcome === 'save') t = `🧤 KURTARDI!<br><small>${kn}${R.power < 55 ? ' (şut yumuşaktı)' : ' tam yerini tuttu'}</small>`;
+  else t = `🚀 AUT!<br><small>${sn} topu tribünlere yolladı</small>`;
+  $('#g-banner').innerHTML = t;
+}
+
+function renderOver() {
+  const sorted = [...S.players].sort((a, b) => b.score - a.score);
+  $('#o-rank').innerHTML = sorted.map((p, i) => `<li><span><b>${['🥇', '🥈', '🥉'][i] || i + 1 + '.'}</b>${esc(p.name)}</span><b>${p.score}</b></li>`).join('');
+}
+$('#btn-again').onclick = () => api('again', { room, pid: me });
+
+/* ---------- Zamanlayıcı + güç göstergesi ---------- */
+function frame(now) {
+  if (S && (S.phase === 'play' || S.phase === 'reveal') && S.dur) {
+    const left = Math.max(0, S.ms - (now - recvAt));
+    $('#g-bar').style.width = (left / S.dur) * 100 + '%';
+  }
+  if (S && S.phase === 'play' && S.shooterId === me && !submitted) {
+    meterVal = ((1 - Math.cos((now / 1000) * ((2 * Math.PI) / 1.3))) / 2) * 100;
+    $('#meter-i').style.left = `calc(${meterVal}% - ${meterVal * 0.06}px)`;
+  }
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+
+/* ---------- Sesli sohbet (WebRTC, sadece ses) ---------- */
+const peers = {}, pend = {};
+const RTC_CFG = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }, { urls: 'stun:stun1.l.google.com:19302' }] };
+
+async function initMic() {
+  try {
+    localStream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true } });
+  } catch (e) { localStream = null; }
+}
+function updateMicBtn() {
+  const b = $('#micbtn');
+  if (!localStream) { b.textContent = '🔇 Mikrofon yok'; b.className = 'off'; return; }
+  const on = localStream.getAudioTracks()[0].enabled;
+  b.textContent = on ? '🎙️ Açık' : '🔇 Kapalı';
+  b.className = on ? '' : 'off';
+}
+$('#micbtn').onclick = () => {
+  if (!localStream) return alert('Mikrofon izni verilmedi. Tarayıcı ayarlarından mikrofona izin verip sayfayı yenile ve tekrar katıl.');
+  const t = localStream.getAudioTracks()[0];
+  t.enabled = !t.enabled;
+  updateMicBtn();
+};
+document.addEventListener('click', () => document.querySelectorAll('audio').forEach((a) => a.play().catch(() => {})));
+
+function sig(to, data) { api('signal', { room, pid: me, to, data }); }
+
+function makePeer(id) {
+  const pc = new RTCPeerConnection(RTC_CFG);
+  const p = { pc, q: (pend[id] || []).splice(0), audio: document.createElement('audio') };
+  p.audio.autoplay = true; p.audio.playsInline = true;
+  document.body.appendChild(p.audio);
+  pc.ontrack = (e) => { p.audio.srcObject = e.streams[0]; p.audio.play().catch(() => {}); };
+  pc.onicecandidate = (e) => { if (e.candidate) sig(id, { ice: e.candidate }); };
+  peers[id] = p;
+  return p;
+}
+function addLocal(p) { if (localStream) localStream.getTracks().forEach((t) => p.pc.addTrack(t, localStream)); }
+async function flush(p) { while (p.q.length) await p.pc.addIceCandidate(p.q.shift()).catch(() => {}); }
+
+async function startCall(id) {
+  const p = makePeer(id);
+  if (localStream) addLocal(p); else p.pc.addTransceiver('audio', { direction: 'recvonly' });
+  const offer = await p.pc.createOffer();
+  await p.pc.setLocalDescription(offer);
+  sig(id, { sdp: p.pc.localDescription });
+}
+
+async function onSignal({ from, data }) {
+  let p = peers[from];
+  try {
+    if (data.sdp) {
+      if (data.sdp.type === 'offer') {
+        if (p) { p.pc.close(); p.audio.remove(); delete peers[from]; }
+        p = makePeer(from);
+        await p.pc.setRemoteDescription(data.sdp);
+        addLocal(p);
+        await flush(p);
+        const ans = await p.pc.createAnswer();
+        await p.pc.setLocalDescription(ans);
+        sig(from, { sdp: p.pc.localDescription });
+      } else if (p) {
+        await p.pc.setRemoteDescription(data.sdp);
+        await flush(p);
+      }
+    } else if (data.ice) {
+      if (p && p.pc.remoteDescription) await p.pc.addIceCandidate(data.ice).catch(() => {});
+      else if (p) p.q.push(data.ice);
+      else (pend[from] = pend[from] || []).push(data.ice);
+    }
+  } catch (e) { console.warn('signal', e); }
+}
+
+// Küçük id'li oyuncu aramayı başlatır; böylece iki taraf aynı anda teklif göndermez.
+function syncPeers() {
+  const ids = S.players.filter((p) => !p.bot).map((p) => p.id).filter((id) => id !== me);
+  ids.forEach((id) => { if (!peers[id] && me < id) startCall(id); });
+  Object.keys(peers).forEach((id) => {
+    if (!ids.includes(id)) { peers[id].pc.close(); peers[id].audio.remove(); delete peers[id]; }
+  });
+}
+</script>
+</body>
+</html>
