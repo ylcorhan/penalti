@@ -7,7 +7,7 @@ const crypto = require('crypto');
 
 const PORT = process.env.PORT || 3000;
 const PLAY_MS = 15000;
-const REVEAL_MS = 4500;
+const REVEAL_MS = 5500;
 const MAX_PLAYERS = 6;
 const ALPHA = 'ABCDEFGHJKLMNPRSTUVYZ';
 const rooms = new Map();

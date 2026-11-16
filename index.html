@@ -3,13 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>Gol Düellosu</title>
+<title>Gol Düellosu 3D</title>
 <style>
 :root{--ac:#ffd23f;--tx:#f4fff6;--mut:#9cc7aa;--card:rgba(255,255,255,.08)}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0}
 body{background:radial-gradient(circle at 50% 0,#1f6a3d,#0b1f14 70%);color:var(--tx);font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;min-height:100dvh}
-.screen{display:none;padding:16px 16px 90px;max-width:480px;margin:0 auto}
+.screen{display:none;padding:16px 16px 90px;max-width:520px;margin:0 auto}
 .screen.on{display:block}
 h1{text-align:center;font-size:30px;margin:18px 0 4px}
 .sub{text-align:center;color:var(--mut);margin:0 0 20px}
@@ -24,33 +24,36 @@ button:disabled{opacity:.4}
 .plist{list-style:none;padding:0;margin:0}
 .plist li{padding:10px 12px;border-radius:10px;background:rgba(255,255,255,.07);margin-bottom:6px;display:flex;justify-content:space-between}
 .hint{color:var(--mut);font-size:14px;text-align:center}
-.top{display:flex;justify-content:space-between;align-items:center;font-weight:700;margin-bottom:6px}
-.bar{height:8px;background:rgba(255,255,255,.15);border-radius:6px;overflow:hidden;margin-bottom:10px}
+.rank li b{margin-right:8px}
+
+/* ---- Oyun ekranı ---- */
+#s-game{padding:0 0 100px}
+.stage{position:relative;width:100%;height:clamp(300px,58dvh,125vw);background:#7fb8ea;overflow:hidden;border-radius:0 0 18px 18px}
+#c3d{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none}
+.hud{position:absolute;left:12px;right:12px;top:8px;pointer-events:none;text-shadow:0 1px 4px #000b}
+.htop{display:flex;justify-content:space-between;font-weight:800;font-size:15px;margin-bottom:5px}
+.bar{height:6px;background:rgba(0,0,0,.35);border-radius:4px;overflow:hidden}
 .bar i{display:block;height:100%;width:100%;background:var(--ac)}
-.scores{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-bottom:8px}
+.tag{position:absolute;transform:translate(-50%,-100%);background:rgba(0,0,0,.55);padding:2px 8px;border-radius:10px;font-size:12px;font-weight:700;pointer-events:none;white-space:nowrap;display:none}
+.banner{position:absolute;left:0;right:0;top:32%;text-align:center;font-size:42px;font-weight:900;text-shadow:0 3px 12px #000c;pointer-events:none;opacity:0;transform:scale(.5);line-height:1.1;padding:0 10px}
+.banner small{display:block;font-size:16px;font-weight:700;margin-top:4px}
+.banner.show{animation:pop .45s ease-out forwards}
+@keyframes pop{0%{opacity:0;transform:scale(.4)}70%{opacity:1;transform:scale(1.12)}100%{opacity:1;transform:scale(1)}}
+.pad{padding:0 14px}
+.scores{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin:10px 0 6px}
 .chip{background:rgba(255,255,255,.1);border-radius:20px;padding:5px 12px;font-size:14px;display:flex;gap:8px;border:2px solid transparent}
 .chip.sh{border-color:var(--ac)}
 .chip.kp{border-color:#5ec8ff}
 .chip span{color:var(--ac);font-weight:900}
-.role{text-align:center;font-size:18px;font-weight:700;min-height:48px;margin:4px 0}
-.field{position:relative;margin:34px 6px 90px}
-.goal{position:relative;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(2,1fr);aspect-ratio:3/2;border:5px solid #fff;border-bottom:0;background:repeating-linear-gradient(45deg,rgba(255,255,255,.06) 0 6px,transparent 6px 12px)}
-.cell{border:1px dashed rgba(255,255,255,.3);transition:background .15s}
-.cell.aim{background:rgba(255,210,63,.45)}
-.cell.shot{background:rgba(255,80,80,.35)}
-.cell.kp{outline:3px solid #5ec8ff;outline-offset:-3px}
-.ball,.keeper{position:absolute;transform:translate(-50%,-50%);font-size:34px;pointer-events:none;transition:left .7s ease-out,top .7s ease-out}
-.keeper{font-size:42px}
-.grass{position:absolute;left:-6px;right:-6px;top:100%;height:80px;background:linear-gradient(#2f8f4e,transparent);border-top:3px solid #fff;opacity:.5}
-.meter{position:relative;height:26px;border-radius:13px;background:linear-gradient(90deg,#f5b700 0 55%,#2ecc71 55% 88%,#e74c3c 88% 100%);margin:10px 0 4px;overflow:hidden}
+.role{text-align:center;font-size:17px;font-weight:700;min-height:46px;margin:4px 0 8px}
+.meter{position:relative;height:26px;border-radius:13px;background:linear-gradient(90deg,#f5b700 0 55%,#2ecc71 55% 88%,#e74c3c 88% 100%);margin:6px 0 4px;overflow:hidden}
 .meter i{position:absolute;top:0;bottom:0;width:6px;background:#fff;box-shadow:0 0 6px #000;left:0}
 .legend{display:flex;justify-content:space-between;font-size:11px;color:var(--mut);margin-bottom:10px}
-.banner{text-align:center;font-size:22px;font-weight:900;min-height:60px;margin-top:6px}
-.rank li b{margin-right:8px}
 #micbtn{position:fixed;right:14px;bottom:14px;width:auto;padding:12px 16px;font-size:15px;z-index:5;background:#fff;color:#222}
 #micbtn.off{background:#ff5a5a;color:#fff}
 #toast{position:fixed;left:50%;top:14px;transform:translateX(-50%);background:#000c;padding:10px 16px;border-radius:10px;display:none;z-index:9}
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
 <body>
 
@@ -91,27 +94,25 @@ button:disabled{opacity:.4}
 
 <!-- OYUN -->
 <div class="screen" id="s-game">
-  <div class="top"><div id="g-round"></div><div id="g-phase"></div></div>
-  <div class="bar"><i id="g-bar"></i></div>
-  <div class="scores" id="g-scores"></div>
-  <div class="role" id="g-role"></div>
-
-  <div class="field">
-    <div class="goal" id="goal">
-      <div class="cell" data-i="0"></div><div class="cell" data-i="1"></div><div class="cell" data-i="2"></div>
-      <div class="cell" data-i="3"></div><div class="cell" data-i="4"></div><div class="cell" data-i="5"></div>
-      <div class="keeper" id="keeper">🧤</div>
-      <div class="ball" id="ball">⚽</div>
+  <div class="stage" id="stage">
+    <canvas id="c3d"></canvas>
+    <div class="hud">
+      <div class="htop"><div id="g-round"></div><div id="g-phase"></div></div>
+      <div class="bar"><i id="g-bar"></i></div>
     </div>
-    <div class="grass"></div>
+    <div class="tag" id="tag-sh"></div>
+    <div class="tag" id="tag-kp"></div>
+    <div class="banner" id="g-banner"></div>
   </div>
-
-  <div id="g-shootui" style="display:none">
-    <div class="meter"><i id="meter-i"></i></div>
-    <div class="legend"><span>yumuşak (kurtarılabilir)</span><span>sert (tam isabet)</span><span>aut</span></div>
+  <div class="pad">
+    <div class="scores" id="g-scores"></div>
+    <div class="role" id="g-role"></div>
+    <div id="g-shootui" style="display:none">
+      <div class="meter"><i id="meter-i"></i></div>
+      <div class="legend"><span>yumuşak (kurtarılabilir)</span><span>sert (tam isabet)</span><span>aut</span></div>
+    </div>
+    <button id="btn-act" style="display:none"></button>
   </div>
-  <button id="btn-act" style="display:none"></button>
-  <div class="banner" id="g-banner"></div>
 </div>
 
 <!-- BİTİŞ -->
@@ -127,7 +128,7 @@ button:disabled{opacity:.4}
 const $ = (s) => document.querySelector(s);
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 let S = null, me = null, room = null, es = null, localStream = null;
-let aim = null, submitted = false, lastKey = '', recvAt = 0, meterVal = 0;
+let aim = null, submitted = false, lastKey = '', recvAt = 0, meterVal = 0, solo = false;
 
 async function api(path, body) {
   try {
@@ -143,8 +144,8 @@ const qs = new URLSearchParams(location.search);
 if (qs.get('oda')) $('#code').value = qs.get('oda').toUpperCase().slice(0, 4);
 $('#name').value = localStorage.getItem('gd-name') || '';
 
-let solo = false;
 async function enter(kind) {
+  unlockAudio();
   const name = $('#name').value.trim() || 'Oyuncu';
   localStorage.setItem('gd-name', name);
   solo = kind === 'solo';
@@ -156,7 +157,6 @@ async function enter(kind) {
   if (res.error) return toast(res.error);
   room = res.room; me = res.pid;
   if (solo) {
-    // 3 bot ekle (toplam 4 kişi) ve oyunu hemen başlat
     for (let i = 0; i < 3; i++) await api('addbot', { room, pid: me });
     await api('start', { room, pid: me });
   }
@@ -181,6 +181,7 @@ function onState() {
   if (S.phase === 'lobby') { show('s-lobby'); renderLobby(); lastKey = ''; return; }
   if (S.phase === 'over') { show('s-over'); renderOver(); return; }
   show('s-game');
+  ensure3D();
   const key = S.round + ':' + S.phase;
   if (key !== lastKey) {
     lastKey = key;
@@ -220,9 +221,9 @@ function renderGame() {
   const sn = esc(nameOf(S.shooterId)), kn = esc(nameOf(S.keeperId));
   let role;
   if (S.phase === 'reveal') role = '';
-  else if (isSh) role = '⚽ Şutçusun! Köşeyi seç, gücü doğru anda yakala.';
-  else if (isKp) role = '🧤 Kalecisin! Nereye atlayacağını seç.';
-  else role = `⚽ ${sn} şut çekiyor, 🧤 ${kn} kalede.<br><small>Mikrofonu aç, tezahürat yap 📣</small>`;
+  else if (isSh) role = '⚽ Şutçusun! Kaleye dokunup köşeyi seç, sonra gücü yakala.';
+  else if (isKp) role = '🧤 Kalecisin! Kaleye dokunup atlayacağın köşeyi seç.';
+  else role = `⚽ ${sn} şut çekiyor, 🧤 ${kn} kalede.<br><small>${S.locked.shooter ? '✅' : '⏳'} Şutçu &nbsp; ${S.locked.keeper ? '✅' : '⏳'} Kaleci · Mikrofonu aç, tezahürat yap 📣</small>`;
   $('#g-role').innerHTML = role;
   const play = S.phase === 'play';
   $('#g-shootui').style.display = play && isSh && !submitted ? 'block' : 'none';
@@ -232,32 +233,11 @@ function renderGame() {
     btn.textContent = submitted ? 'Hazır, rakip bekleniyor…' : isSh ? '⚽ ŞUT!' : '🧤 ATIL!';
     btn.disabled = submitted || aim === null;
   }
-  if (play && !isSh && !isKp) $('#g-banner').textContent = `${S.locked.shooter ? '✅' : '⏳'} Şutçu   ${S.locked.keeper ? '✅' : '⏳'} Kaleci`;
-  else if (play) $('#g-banner').textContent = '';
+  $('#tag-sh').textContent = '⚽ ' + nameOf(S.shooterId);
+  $('#tag-kp').textContent = '🧤 ' + nameOf(S.keeperId);
+  applyHL();
 }
 
-/* ---------- Saha ---------- */
-const colX = (c) => ((c * 2 + 1) / 6) * 100;
-const rowY = (r) => ((r * 2 + 1) / 4) * 100;
-function place(el, left, top, animate) {
-  el.style.transition = animate ? '' : 'none';
-  el.style.left = left + '%'; el.style.top = top + '%';
-  if (!animate) void el.offsetWidth;
-}
-function startPlay() {
-  aim = null; submitted = false;
-  document.querySelectorAll('.cell').forEach((c) => (c.className = 'cell'));
-  place($('#ball'), 50, 135, false);
-  place($('#keeper'), 50, 55, false);
-  $('#g-banner').textContent = '';
-}
-document.querySelectorAll('.cell').forEach((c) => (c.onclick = () => {
-  if (!S || S.phase !== 'play' || submitted) return;
-  if (S.shooterId !== me && S.keeperId !== me) return;
-  aim = Number(c.dataset.i);
-  document.querySelectorAll('.cell').forEach((x) => x.classList.toggle('aim', x === c));
-  renderGame();
-}));
 $('#btn-act').onclick = async () => {
   if (aim === null || submitted) return;
   submitted = true;
@@ -266,23 +246,6 @@ $('#btn-act').onclick = async () => {
   const r = await api('pick', { room, pid: me, cell: aim, power });
   if (!r.ok) { submitted = false; renderGame(); }
 };
-
-function doReveal() {
-  const R = S.result;
-  const kx = colX(R.keeperCell % 3), ky = rowY(Math.floor(R.keeperCell / 3));
-  const sx = colX(R.shotCell % 3), sy = rowY(Math.floor(R.shotCell / 3));
-  document.querySelectorAll('.cell').forEach((c, i) => { c.className = 'cell' + (i === R.shotCell ? ' shot' : '') + (i === R.keeperCell ? ' kp' : ''); });
-  place($('#keeper'), kx, ky, true);
-  if (R.outcome === 'miss') place($('#ball'), sx, -22, true);
-  else if (R.outcome === 'save') place($('#ball'), kx, ky, true);
-  else place($('#ball'), sx, sy, true);
-  const sn = esc(nameOf(R.shooterId)), kn = esc(nameOf(R.keeperId));
-  let t;
-  if (R.outcome === 'goal') t = `⚽ GOL!<br><small>${sn} attı</small>`;
-  else if (R.outcome === 'save') t = `🧤 KURTARDI!<br><small>${kn}${R.power < 55 ? ' (şut yumuşaktı)' : ' tam yerini tuttu'}</small>`;
-  else t = `🚀 AUT!<br><small>${sn} topu tribünlere yolladı</small>`;
-  $('#g-banner').innerHTML = t;
-}
 
 function renderOver() {
   const sorted = [...S.players].sort((a, b) => b.score - a.score);
@@ -303,6 +266,708 @@ function frame(now) {
   requestAnimationFrame(frame);
 }
 requestAnimationFrame(frame);
+
+/* ---------- Ses efektleri ---------- */
+let actx = null, noiseBuf = null;
+function unlockAudio() {
+  try {
+    if (!actx) actx = new (window.AudioContext || window.webkitAudioContext)();
+    if (actx.state === 'suspended') actx.resume();
+  } catch (e) { /* ses yok */ }
+}
+function sfx(kind) {
+  try {
+    if (!actx) return;
+    if (actx.state === 'suspended') actx.resume();
+    const t = actx.currentTime;
+    const g = actx.createGain();
+    g.connect(actx.destination);
+    if (kind === 'kick' || kind === 'save') {
+      const o = actx.createOscillator();
+      o.type = 'sine';
+      o.frequency.setValueAtTime(kind === 'kick' ? 170 : 110, t);
+      o.frequency.exponentialRampToValueAtTime(45, t + 0.14);
+      g.gain.setValueAtTime(0.55, t);
+      g.gain.exponentialRampToValueAtTime(0.001, t + 0.16);
+      o.connect(g); o.start(t); o.stop(t + 0.2);
+    } else if (kind === 'goal') {
+      if (!noiseBuf) {
+        noiseBuf = actx.createBuffer(1, actx.sampleRate * 1.6, actx.sampleRate);
+        const d = noiseBuf.getChannelData(0);
+        for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+      }
+      const n = actx.createBufferSource(); n.buffer = noiseBuf;
+      const f = actx.createBiquadFilter(); f.type = 'bandpass'; f.frequency.value = 1100; f.Q.value = 0.7;
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(0.35, t + 0.25);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + 1.5);
+      n.connect(f); f.connect(g); n.start(t); n.stop(t + 1.6);
+    } else if (kind === 'miss') {
+      const o = actx.createOscillator();
+      o.type = 'sawtooth';
+      o.frequency.setValueAtTime(330, t);
+      o.frequency.exponentialRampToValueAtTime(140, t + 0.6);
+      g.gain.setValueAtTime(0.12, t);
+      g.gain.exponentialRampToValueAtTime(0.001, t + 0.65);
+      o.connect(g); o.start(t); o.stop(t + 0.7);
+    }
+  } catch (e) { /* yoksay */ }
+}
+
+/* =====================================================================
+   3D SAHNE (three.js)
+   Ölçüler gerçek: kale 7.32 x 2.44 m, penaltı noktası 11 m.
+   Kamera şutçunun arkasında, kaleye doğru bakar. Kale -z yönünde.
+   ===================================================================== */
+const GW = 7.32, GH = 2.44, NET_D = 2.0, SPOT_Z = 11, BR = 0.17, KZ = 0.4, HIPY = 0.92, ARM_L = 1.25;
+const RUN_T = 0.75, KICK_T = 0.155;
+const PAL = [0xe63946, 0x2a9df4, 0xf4a261, 0x9b5de5, 0x06d6a0, 0xf15bb5];
+const cellX = (c) => (c - 1) * (GW / 3);
+const cellY = (r) => (r === 0 ? GH * 0.75 : GH * 0.25);
+const rr = (a, b) => a + Math.random() * (b - a);
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const smooth = (x) => { x = clamp(x, 0, 1); return x * x * (3 - 2 * x); };
+
+let V = null, renderer = null, scene, camera, ballM, ballShadow, S3 = null, K3 = null;
+let cellMeshes = [], confetti = [], camBaseY = 3, camShake = 0, lastW = 0, lastH = 0;
+let SH0, SH_FIN, baseLook, camLook, _v, ray, ndc;
+let anim = null, failed3D = false;
+
+function fail3D(msg) {
+  failed3D = true;
+  const b = $('#g-banner');
+  b.innerHTML = msg + '<small>İnternet bağlantını kontrol edip sayfayı yenile</small>';
+  b.classList.add('show');
+}
+
+function ensure3D() {
+  if (renderer) { resize3D(); return; }
+  if (failed3D) return;
+  if (typeof THREE === 'undefined') return fail3D('3D motoru yüklenemedi');
+  try { init3D(); } catch (e) { console.error(e); renderer = null; return fail3D('3D başlatılamadı'); }
+  resize3D();
+}
+
+function init3D() {
+  V = THREE.Vector3;
+  SH0 = new V(-1.0, 0, SPOT_Z + 2.3);
+  SH_FIN = new V(-0.38, 0, SPOT_Z + 0.6);
+  baseLook = new V(0, 0.8, 3.5);
+  camLook = baseLook.clone();
+  _v = new V();
+  ray = new THREE.Raycaster();
+  ndc = new THREE.Vector2();
+
+  const cv = $('#c3d');
+  renderer = new THREE.WebGLRenderer({ canvas: cv, antialias: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x7fb8ea);
+  scene.fog = new THREE.Fog(0x9cc8ee, 60, 150);
+  camera = new THREE.PerspectiveCamera(50, 1, 0.1, 300);
+  scene.add(new THREE.HemisphereLight(0xffffff, 0x3d7a43, 0.9));
+  const sun = new THREE.DirectionalLight(0xffffff, 0.7);
+  sun.position.set(-10, 20, 12);
+  scene.add(sun);
+
+  buildPitch();
+  buildGoal();
+  buildStadium();
+  buildActors();
+
+  cv.addEventListener('pointerdown', onCanvasTap);
+  window.addEventListener('resize', resize3D);
+  requestAnimationFrame(loop3D);
+}
+
+/* ---- Saha ---- */
+function buildPitch() {
+  const c = document.createElement('canvas');
+  c.width = 64; c.height = 128;
+  const x = c.getContext('2d');
+  x.fillStyle = '#3f9b4b'; x.fillRect(0, 0, 64, 64);
+  x.fillStyle = '#37893f'; x.fillRect(0, 64, 64, 64);
+  const tex = new THREE.CanvasTexture(c);
+  tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+  tex.repeat.set(1, 16);
+  const grass = new THREE.Mesh(new THREE.PlaneGeometry(160, 160), new THREE.MeshLambertMaterial({ map: tex }));
+  grass.rotation.x = -Math.PI / 2;
+  grass.position.z = 20;
+  scene.add(grass);
+
+  const white = new THREE.MeshBasicMaterial({ color: 0xffffff });
+  const line = (x1, z1, x2, z2) => {
+    const len = Math.hypot(x2 - x1, z2 - z1);
+    const m = new THREE.Mesh(new THREE.PlaneGeometry(len, 0.12), white);
+    m.rotation.x = -Math.PI / 2;
+    m.rotation.z = -Math.atan2(z2 - z1, x2 - x1);
+    m.position.set((x1 + x2) / 2, 0.02, (z1 + z2) / 2);
+    scene.add(m);
+  };
+  line(-40, 0, 40, 0);                         // kale çizgisi
+  line(-9.16, 5.5, 9.16, 5.5);                 // 5.5 m alanı
+  line(-9.16, 0, -9.16, 5.5);
+  line(9.16, 0, 9.16, 5.5);
+  line(-20.16, 16.5, 20.16, 16.5);             // ceza sahası
+  line(-20.16, 0, -20.16, 16.5);
+  line(20.16, 0, 20.16, 16.5);
+  const spot = new THREE.Mesh(new THREE.CircleGeometry(0.16, 16), white);
+  spot.rotation.x = -Math.PI / 2;
+  spot.position.set(0, 0.02, SPOT_Z);
+  scene.add(spot);
+  const arc = new THREE.Mesh(new THREE.RingGeometry(9.03, 9.15, 48, 1, Math.PI * 1.5 - 0.93, 1.86), white);
+  arc.rotation.x = -Math.PI / 2;
+  arc.position.set(0, 0.02, SPOT_Z);
+  scene.add(arc);
+}
+
+/* ---- Kale ---- */
+function bar(a, b, r, mat) {
+  const d = new V().subVectors(b, a);
+  const len = d.length();
+  const m = new THREE.Mesh(new THREE.CylinderGeometry(r, r, len, 8), mat);
+  m.position.copy(a).add(b).multiplyScalar(0.5);
+  m.quaternion.setFromUnitVectors(new V(0, 1, 0), d.normalize());
+  return m;
+}
+function buildGoal() {
+  const white = new THREE.MeshLambertMaterial({ color: 0xffffff });
+  const grey = new THREE.MeshLambertMaterial({ color: 0xcfd4da });
+  const hw = GW / 2;
+  [-hw, hw].forEach((x) => {
+    const p = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, GH, 12), white);
+    p.position.set(x, GH / 2, 0);
+    scene.add(p);
+  });
+  const cb = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, GW + 0.12, 12), white);
+  cb.rotation.z = Math.PI / 2;
+  cb.position.set(0, GH, 0);
+  scene.add(cb);
+
+  const TOPB = 2.0;
+  [-hw, hw].forEach((x) => {
+    scene.add(bar(new V(x, GH, 0), new V(x, TOPB, -NET_D), 0.03, grey));
+    scene.add(bar(new V(x, 0.03, 0), new V(x, 0.03, -NET_D), 0.03, grey));
+    scene.add(bar(new V(x, TOPB, -NET_D), new V(x, 0.03, -NET_D), 0.03, grey));
+  });
+  scene.add(bar(new V(-hw, TOPB, -NET_D), new V(hw, TOPB, -NET_D), 0.03, grey));
+  scene.add(bar(new V(-hw, 0.03, -NET_D), new V(hw, 0.03, -NET_D), 0.03, grey));
+
+  // Ağ çizgileri
+  const pts = [];
+  const seg = (a, b) => { pts.push(a[0], a[1], a[2], b[0], b[1], b[2]); };
+  const st = 0.3;
+  for (let x = -hw; x <= hw + 0.001; x += st) seg([x, 0, -NET_D], [x, TOPB, -NET_D]);        // arka dikey
+  for (let y = 0; y <= TOPB + 0.001; y += st) seg([-hw, y, -NET_D], [hw, y, -NET_D]);        // arka yatay
+  for (let x = -hw; x <= hw + 0.001; x += st) seg([x, GH, 0], [x, TOPB, -NET_D]);            // tavan boyuna
+  for (let u = 0; u <= 1.001; u += 0.2) seg([-hw, GH - (GH - TOPB) * u, -NET_D * u], [hw, GH - (GH - TOPB) * u, -NET_D * u]); // tavan enine
+  [-hw, hw].forEach((x) => {
+    for (let y = 0; y <= TOPB + 0.001; y += st) seg([x, y, 0], [x, y, -NET_D]);              // yan boyuna
+    for (let u = 0; u <= 1.001; u += 0.2) seg([x, 0, -NET_D * u], [x, GH - (GH - TOPB) * u, -NET_D * u]); // yan dikey
+  });
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute(pts, 3));
+  scene.add(new THREE.LineSegments(g, new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.55 })));
+}
+
+/* ---- Stadyum ---- */
+function crowdTexture() {
+  const c = document.createElement('canvas');
+  c.width = 512; c.height = 128;
+  const x = c.getContext('2d');
+  x.fillStyle = '#262d45'; x.fillRect(0, 0, 512, 128);
+  const cols = ['#e63946', '#f1faee', '#ffd23f', '#2a9df4', '#f4a261', '#9b5de5', '#06d6a0', '#ffffff'];
+  for (let i = 0; i < 2600; i++) { x.fillStyle = cols[Math.floor(Math.random() * cols.length)]; x.fillRect(Math.random() * 512, Math.random() * 128, 3, 3); }
+  const t = new THREE.CanvasTexture(c);
+  t.wrapS = THREE.RepeatWrapping;
+  t.repeat.set(3, 1);
+  return t;
+}
+function adTexture() {
+  const c = document.createElement('canvas');
+  c.width = 1024; c.height = 64;
+  const x = c.getContext('2d');
+  const cols = ['#e63946', '#1d3557', '#ffd23f', '#2a9df4', '#06d6a0', '#f4a261', '#9b5de5', '#111111'];
+  for (let i = 0; i < 16; i++) {
+    x.fillStyle = cols[i % cols.length]; x.fillRect(i * 64, 0, 64, 64);
+    x.fillStyle = '#ffffff'; x.fillRect(i * 64 + 10, 26, 44, 12);
+  }
+  const t = new THREE.CanvasTexture(c);
+  t.wrapS = THREE.RepeatWrapping;
+  t.repeat.set(3, 1);
+  return t;
+}
+function buildStadium() {
+  const crowd = new THREE.MeshBasicMaterial({ map: crowdTexture(), color: 0xc8c8c8 });
+  const back = new THREE.Mesh(new THREE.PlaneGeometry(110, 18), crowd);
+  back.rotation.x = -0.55;
+  back.position.set(0, 7.5, -16);
+  scene.add(back);
+  [-1, 1].forEach((sg) => {
+    const grp = new THREE.Group();
+    grp.position.set(sg * 26, 0, 12);
+    grp.rotation.y = -sg * Math.PI / 2;
+    const m = new THREE.Mesh(new THREE.PlaneGeometry(110, 18), crowd);
+    m.rotation.x = -0.55;
+    m.position.set(0, 7.5, -6);
+    grp.add(m);
+    scene.add(grp);
+  });
+  const track = new THREE.Mesh(new THREE.PlaneGeometry(160, 6), new THREE.MeshLambertMaterial({ color: 0x555a66 }));
+  track.rotation.x = -Math.PI / 2;
+  track.position.set(0, 0.015, -8.5);
+  scene.add(track);
+
+  const ad = new THREE.MeshBasicMaterial({ map: adTexture() });
+  const adBack = new THREE.Mesh(new THREE.BoxGeometry(110, 1, 0.2), ad);
+  adBack.position.set(0, 0.5, -5.5);
+  scene.add(adBack);
+  [-1, 1].forEach((sg) => {
+    const a = new THREE.Mesh(new THREE.BoxGeometry(0.2, 1, 110), ad);
+    a.position.set(sg * 23, 0.5, 12);
+    scene.add(a);
+  });
+}
+
+/* ---- Oyuncular ---- */
+function makePlayer(isKeeper) {
+  const g = new THREE.Group();
+  const mk = (c) => new THREE.MeshLambertMaterial({ color: c });
+  const m = {
+    shirt: mk(0xe63946), shorts: mk(isKeeper ? 0x151515 : 0xf5f5f5), skin: mk(0xf1c27d),
+    shoe: mk(0x111111), hair: mk(0x2b1b0e), glove: mk(0xff9f1c), eye: new THREE.MeshBasicMaterial({ color: 0x111111 }),
+  };
+  m.sock = isKeeper ? mk(0x222222) : m.shirt;
+  const box = (w, h, d, mat, x, y, z, parent) => {
+    const b = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat);
+    b.position.set(x, y, z);
+    (parent || g).add(b);
+    return b;
+  };
+  box(0.5, 0.62, 0.26, m.shirt, 0, 1.26, 0);
+  box(0.46, 0.2, 0.27, m.shorts, 0, 0.93, 0);
+  const leg = (sx) => {
+    const p = new THREE.Group();
+    p.position.set(sx * 0.12, 0.86, 0);
+    g.add(p);
+    box(0.17, 0.8, 0.19, m.sock, 0, -0.4, 0, p);
+    box(0.19, 0.3, 0.21, m.shorts, 0, -0.14, 0, p);
+    box(0.19, 0.09, 0.32, m.shoe, 0, -0.81, -0.06, p);
+    return p;
+  };
+  const arm = (sx) => {
+    const p = new THREE.Group();
+    p.position.set(sx * 0.32, 1.5, 0);
+    g.add(p);
+    if (isKeeper) {
+      box(0.13, 0.56, 0.13, m.shirt, 0, -0.28, 0, p);
+      const gl = new THREE.Mesh(new THREE.SphereGeometry(0.1, 10, 8), m.glove);
+      gl.position.y = -0.6;
+      p.add(gl);
+    } else {
+      box(0.14, 0.22, 0.14, m.shirt, 0, -0.11, 0, p);
+      box(0.1, 0.34, 0.1, m.skin, 0, -0.39, 0, p);
+    }
+    return p;
+  };
+  const legL = leg(-1), legR = leg(1), armL = arm(-1), armR = arm(1);
+  const head = new THREE.Mesh(new THREE.SphereGeometry(0.14, 14, 10), m.skin);
+  head.position.y = 1.78;
+  g.add(head);
+  const hair = new THREE.Mesh(new THREE.SphereGeometry(0.15, 14, 10), m.hair);
+  hair.scale.set(1, 0.75, 1);
+  hair.position.set(0, 1.84, 0.02);
+  g.add(hair);
+  [-1, 1].forEach((sx) => {
+    const e = new THREE.Mesh(new THREE.SphereGeometry(0.022, 6, 6), m.eye);
+    e.position.set(sx * 0.05, 1.79, -0.128);
+    g.add(e);
+  });
+  return { g, legL, legR, armL, armR, m };
+}
+
+function ballTexture() {
+  const c = document.createElement('canvas');
+  c.width = 256; c.height = 128;
+  const x = c.getContext('2d');
+  x.fillStyle = '#ffffff'; x.fillRect(0, 0, 256, 128);
+  x.fillStyle = '#1b1b1b';
+  for (let r = 0; r < 3; r++) for (let q = 0; q < 6; q++) {
+    x.beginPath();
+    x.arc(q * 43 + (r % 2) * 21 + 12, 22 + r * 42, 13, 0, Math.PI * 2);
+    x.fill();
+  }
+  return new THREE.CanvasTexture(c);
+}
+function blob(r) {
+  const m = new THREE.Mesh(new THREE.CircleGeometry(r, 16), new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.3, depthWrite: false }));
+  m.rotation.x = -Math.PI / 2;
+  m.position.y = 0.03;
+  scene.add(m);
+  return m;
+}
+
+function buildActors() {
+  ballM = new THREE.Mesh(new THREE.SphereGeometry(BR, 18, 14), new THREE.MeshLambertMaterial({ map: ballTexture() }));
+  ballM.position.set(0, BR, SPOT_Z);
+  scene.add(ballM);
+  ballShadow = blob(0.22);
+
+  const sh = makePlayer(false);
+  scene.add(sh.g);
+  S3 = { g: sh.g, legL: sh.legL, legR: sh.legR, armL: sh.armL, armR: sh.armR, m: sh.m, shadow: blob(0.45) };
+
+  const kp = makePlayer(true);
+  kp.m.shirt.color.setHex(0x39d353);
+  kp.g.rotation.y = Math.PI;
+  kp.g.position.y = -HIPY;
+  const D = new THREE.Group();
+  D.add(kp.g);
+  const M = new THREE.Object3D();
+  D.add(M);
+  scene.add(D);
+  K3 = { D, P: kp.g, M, legL: kp.legL, legR: kp.legR, armL: kp.armL, armR: kp.armR, shadow: blob(0.5) };
+
+  // Kale ağzındaki 6 bölge: dokunarak seçilir
+  const hl = new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.55 });
+  const pts = [];
+  [-GW / 6, GW / 6].forEach((x) => pts.push(x, 0, 0.03, x, GH, 0.03));
+  pts.push(-GW / 2, GH / 2, 0.03, GW / 2, GH / 2, 0.03);
+  const lg = new THREE.BufferGeometry();
+  lg.setAttribute('position', new THREE.Float32BufferAttribute(pts, 3));
+  scene.add(new THREE.LineSegments(lg, hl));
+  for (let i = 0; i < 6; i++) {
+    const c = i % 3, r = Math.floor(i / 3);
+    const m = new THREE.Mesh(new THREE.PlaneGeometry(GW / 3, GH / 2), new THREE.MeshBasicMaterial({ color: 0xffd23f, transparent: true, opacity: 0, depthWrite: false, side: THREE.DoubleSide }));
+    m.position.set(cellX(c), cellY(r), 0.02);
+    scene.add(m);
+    cellMeshes.push(m);
+  }
+
+  // Konfeti havuzu
+  const cc = [0xe63946, 0xffd23f, 0x2a9df4, 0xffffff, 0x06d6a0, 0xf15bb5];
+  for (let i = 0; i < 70; i++) {
+    const m = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.1, 0.02), new THREE.MeshBasicMaterial({ color: cc[i % cc.length] }));
+    m.visible = false;
+    scene.add(m);
+    confetti.push({ m, v: new V(), life: 0 });
+  }
+}
+
+/* ---- Boyut / kamera ---- */
+function resize3D() {
+  const st = $('#stage');
+  if (!renderer || !st) return;
+  const w = st.clientWidth, h = st.clientHeight;
+  if (!w || !h || (w === lastW && h === lastH)) return;
+  lastW = w; lastH = h;
+  renderer.setSize(w, h, false);
+  camera.aspect = w / h;
+  const vf = (50 * Math.PI) / 180;
+  const need = (GW / 2 * 1.3) / (Math.tan(vf / 2) * camera.aspect);
+  const camZ = Math.max(SPOT_Z + 5.8, need);
+  camBaseY = 3.0 + (camZ - (SPOT_Z + 5.8)) * 0.12;
+  camera.position.set(0, camBaseY, camZ);
+  camera.updateProjectionMatrix();
+}
+
+/* ---- Dokunarak köşe seçme ---- */
+function onCanvasTap(e) {
+  if (!S || S.phase !== 'play' || submitted) return;
+  if (S.shooterId !== me && S.keeperId !== me) return;
+  const cv = $('#c3d');
+  const r = cv.getBoundingClientRect();
+  ndc.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
+  ray.setFromCamera(ndc, camera);
+  const o = ray.ray.origin, d = ray.ray.direction;
+  if (Math.abs(d.z) < 1e-6) return;
+  const k = -o.z / d.z;
+  if (k < 0) return;
+  const x = o.x + d.x * k, y = o.y + d.y * k;
+  if (Math.abs(x) > GW / 2 + 1.4 || y < -0.6 || y > GH + 1.3) return;
+  const c = clamp(Math.floor((x + GW / 2) / (GW / 3)), 0, 2);
+  aim = (y > GH / 2 ? 0 : 1) * 3 + c;
+  renderGame();
+}
+
+function applyHL() {
+  if (!renderer) return;
+  cellMeshes.forEach((m, i) => {
+    let o = 0, c = 0xffd23f;
+    if (S && S.phase === 'play' && aim === i) o = 0.42;
+    else if (S && S.phase === 'reveal' && S.result && anim && anim.hl) {
+      if (i === S.result.keeperCell) { c = 0x5ec8ff; o = 0.3; }
+      if (i === S.result.shotCell) { c = 0xff5050; o = 0.35; }
+    }
+    m.material.color.setHex(c);
+    m.material.opacity = o;
+  });
+}
+
+/* ---- Tur başlangıcı / sonuç ---- */
+function setShooterColor() {
+  if (!renderer || !S) return;
+  const idx = Math.max(0, S.players.findIndex((p) => p.id === S.shooterId));
+  S3.m.shirt.color.setHex(PAL[idx % PAL.length]);
+}
+
+function startPlay() {
+  aim = null; submitted = false; anim = null;
+  const b = $('#g-banner');
+  b.classList.remove('show');
+  b.innerHTML = '';
+  if (!renderer) return;
+  camLook.copy(baseLook);
+  confetti.forEach((c) => { c.m.visible = false; c.life = 0; });
+  ballM.rotation.set(0, 0, 0);
+  setShooterColor();
+  applyHL();
+}
+
+function diveTarget(cell) {
+  const c = cell % 3, r = Math.floor(cell / 3), tx = cellX(c), ty = cellY(r);
+  if (c !== 1) {
+    const sg = c === 2 ? 1 : -1, ang = 1.25;
+    return { H: new V(tx - sg * ARM_L * Math.sin(ang), Math.max(0.3, ty - ARM_L * Math.cos(ang)), 0), rot: -sg * ang, armX: Math.PI, mlY: ARM_L, jump: r === 0 ? 0.25 : 0.05, land: 0.3 };
+  }
+  if (r === 0) return { H: new V(0, 1.0, 0), rot: 0, armX: Math.PI, mlY: ty - 1.0, jump: 0.15, land: HIPY };
+  return { H: new V(0, 0.6, 0), rot: 0, armX: 1.0, mlY: ty - 0.6, jump: 0, land: 0.6 };
+}
+
+function doReveal() {
+  const R = S.result;
+  const sn = esc(nameOf(R.shooterId)), kn = esc(nameOf(R.keeperId));
+  let html, snd;
+  if (R.outcome === 'goal') { html = `⚽ GOL!<small>${sn} attı</small>`; snd = 'goal'; }
+  else if (R.outcome === 'save') { html = `🧤 KURTARDI!<small>${kn}${R.power < 55 ? ' (şut yumuşaktı)' : ' tam yerini tuttu'}</small>`; snd = 'save'; }
+  else { html = `🚀 AUT!<small>${sn} topu tribünlere yolladı</small>`; snd = 'miss'; }
+
+  if (!renderer) { const b = $('#g-banner'); b.innerHTML = html; b.classList.add('show'); return; }
+
+  setShooterColor();
+  const col = R.shotCell % 3, row = Math.floor(R.shotCell / 3);
+  const kcol = R.keeperCell % 3, krow = Math.floor(R.keeperCell / 3);
+  const power = clamp(R.power, 0, 100);
+  const tf = 1.0 - 0.55 * (power / 100);
+  const p0 = new V(0, BR, SPOT_Z);
+  let p1;
+  if (R.outcome === 'goal') p1 = new V(cellX(col) + rr(-0.45, 0.45), cellY(row) + rr(-0.22, 0.22), 0);
+  else if (R.outcome === 'save') p1 = new V(cellX(kcol), cellY(krow), KZ);
+  else p1 = new V(cellX(col) * 1.1, GH + 0.9 + Math.random() * 0.7, 0);
+  const v0 = new V().subVectors(p1, p0);
+  v0.y += 4.9 * tf * tf;
+  v0.divideScalar(tf);
+
+  anim = {
+    start: performance.now(), R, html, snd, tf, p0, p1, v0,
+    tL: RUN_T + KICK_T,
+    dk: Math.max(0.3, tf * 0.92),
+    kd: diveTarget(R.keeperCell),
+    caught: R.outcome === 'save' && power < 55,
+    celebrate: R.outcome === 'goal',
+    sway0: K3.D.position.x,
+    kicked: false, post: null, hl: false, tOut: 0,
+  };
+  applyHL();
+}
+
+function initPost(a, t) {
+  const vel = a.v0.clone();
+  vel.y -= 9.8 * a.tf;
+  a.post = { pos: a.p1.clone(), vel };
+  a.tOut = t;
+  a.hl = true;
+  if (a.R.outcome === 'save' && !a.caught) vel.set(rr(-3, 3), 3.2, 4.5 + Math.random() * 2);
+  if (a.R.outcome === 'goal') { burstConfetti(); camShake = 1; }
+  sfx(a.snd);
+  const b = $('#g-banner');
+  b.innerHTML = a.html;
+  b.classList.remove('show');
+  void b.offsetWidth;
+  b.classList.add('show');
+  applyHL();
+}
+
+function burstConfetti() {
+  confetti.forEach((c) => {
+    c.m.position.set(rr(-2.5, 2.5), rr(0.5, 2.2), rr(-1, 0.5));
+    c.v.set(rr(-3, 3), rr(3, 7), rr(1, 6));
+    c.life = 2.2;
+    c.m.visible = true;
+  });
+}
+
+/* ---- Animasyon ---- */
+function updateShooter(t) {
+  const s = S3;
+  let lL = 0, lR = 0, aL = 0, aR = 0, lean = 0, kz = 0, hop = 0, spread = 0.12;
+  if (!anim) {
+    s.g.position.copy(SH0);
+  } else if (t < RUN_T) {
+    const u = t / RUN_T;
+    s.g.position.lerpVectors(SH0, SH_FIN, smooth(u));
+    const ph = t * 13;
+    lL = Math.sin(ph) * 0.7; lR = -Math.sin(ph) * 0.7;
+    aL = -lR * 0.6; aR = -lL * 0.6;
+    const k = smooth((t - (RUN_T - 0.15)) / 0.15);
+    lR = lR * (1 - k) + -0.9 * k;
+    lean = -0.12 * u;
+  } else {
+    s.g.position.copy(SH_FIN);
+    const k = t - RUN_T;
+    const kk = clamp(k / 0.22, 0, 1);
+    lR = -0.9 + 2.15 * kk; kz = 0.25 * kk; lL = 0.1; lean = -0.2; aL = 0.7; aR = -0.6;
+    if (k > 0.4) {
+      const r = smooth((k - 0.4) / 0.6);
+      lR = lR * (1 - r) + 0.15 * r; kz *= 1 - r; lean *= 1 - r; aL *= 1 - r; aR *= 1 - r;
+    }
+    if (anim.celebrate && anim.post && t > anim.tOut + 0.2) {
+      const c = t - anim.tOut - 0.2;
+      aL = aR = Math.PI * 0.9; spread = 0.35; hop = Math.abs(Math.sin(c * 7)) * 0.25;
+    }
+  }
+  s.legL.rotation.set(lL, 0, 0);
+  s.legR.rotation.set(lR, 0, kz);
+  s.armL.rotation.set(aL, 0, -spread);
+  s.armR.rotation.set(aR, 0, spread);
+  s.g.rotation.x = lean;
+  s.g.position.y = hop;
+  s.shadow.position.x = s.g.position.x;
+  s.shadow.position.z = s.g.position.z;
+}
+
+function updateKeeper(t, now) {
+  const K = K3;
+  if (!anim) {
+    K.D.position.set(Math.sin(now / 520) * 0.28, HIPY, KZ);
+    K.D.rotation.z = 0;
+    K.armL.rotation.set(0, 0, -0.45);
+    K.armR.rotation.set(0, 0, 0.45);
+    K.M.position.set(0, 0.9, 0);
+    K.shadow.position.x = K.D.position.x;
+    K.shadow.position.z = KZ;
+    K.shadow.scale.set(1, 1, 1);
+    return;
+  }
+  const d = anim.kd;
+  const t0 = anim.tL + 0.05;
+  const u = clamp((t - t0) / anim.dk, 0, 1);
+  const e = 1 - (1 - u) * (1 - u);
+  const x0 = anim.sway0 * (1 - smooth(t / 0.3));
+  const x = x0 + (d.H.x - x0) * e;
+  let y = HIPY + (d.H.y - HIPY) * e + d.jump * Math.sin(e * Math.PI);
+  if (u >= 1) {
+    const f = smooth((t - t0 - anim.dk) / 0.45);
+    y = d.H.y + (d.land - d.H.y) * f;
+  }
+  K.D.position.set(x, y, KZ);
+  K.D.rotation.z = d.rot * e;
+  const spread = 0.45 + (0.12 - 0.45) * e;
+  K.armL.rotation.set(d.armX * e, 0, -spread);
+  K.armR.rotation.set(d.armX * e, 0, spread);
+  K.M.position.set(0, 0.9 + (d.mlY - 0.9) * e, 0);
+  K.shadow.position.x = x;
+  K.shadow.position.z = KZ;
+  K.shadow.scale.set(1 + Math.abs(Math.sin(d.rot * e)) * 1.4, 1, 1);
+}
+
+function stepBall(dt) {
+  const b = anim.post;
+  b.vel.y -= 9.8 * dt;
+  b.pos.addScaledVector(b.vel, dt);
+  const p = b.pos, v = b.vel;
+  if (p.y < BR) { p.y = BR; if (v.y < 0) v.y *= -0.45; v.x *= 0.88; v.z *= 0.88; }
+  const hw = GW / 2;
+  if (p.z < 0 && Math.abs(p.x) < hw + 0.2 && p.y < GH + 0.1) {
+    // Ağ topu yavaşlatır, topun kaleden geri çıkmasını engeller
+    v.x *= 1 - 4 * dt; v.z *= 1 - 4 * dt;
+    if (p.z < -NET_D + 0.15) { p.z = -NET_D + 0.15; v.z *= -0.05; v.x *= 0.5; }
+    if (Math.abs(p.x) > hw - 0.15) { p.x = Math.sign(p.x) * (hw - 0.15); v.x *= -0.2; }
+    const roof = GH - (GH - 2.0) * (-p.z / NET_D) - 0.15;
+    if (p.y > roof) { p.y = roof; if (v.y > 0) v.y *= -0.2; }
+  }
+  const drag = 1 - 0.4 * dt;
+  v.x *= drag; v.z *= drag;
+  // Tribün eğimi: aşırı sert şutlar tribüne çarpıp geri düşer
+  const standZ = -11.3 - Math.max(0, p.y) * 0.614;
+  if (p.z < standZ) { p.z = standZ; v.z *= -0.2; v.x *= 0.6; }
+  ballM.position.copy(p);
+  ballM.rotation.x -= v.z * dt * 1.2;
+  ballM.rotation.z += v.x * dt * 1.2;
+}
+
+function updateBall(t, dt) {
+  const a = anim;
+  if (!a) { ballM.position.set(0, BR, SPOT_Z); return; }
+  if (t < a.tL) { ballM.position.copy(a.p0); return; }
+  const s = t - a.tL;
+  if (s <= a.tf) {
+    if (!a.kicked) { a.kicked = true; sfx('kick'); }
+    ballM.position.set(a.p0.x + a.v0.x * s, a.p0.y + a.v0.y * s - 4.9 * s * s, a.p0.z + a.v0.z * s);
+    ballM.rotation.x -= dt * 14;
+    return;
+  }
+  if (!a.post) initPost(a, t);
+  if (a.caught) {
+    K3.D.updateMatrixWorld(true);
+    K3.M.getWorldPosition(ballM.position);
+  } else {
+    stepBall(dt);
+  }
+}
+
+function updateConfetti(dt) {
+  confetti.forEach((c) => {
+    if (!c.m.visible) return;
+    c.v.y -= 9 * dt;
+    c.m.position.addScaledVector(c.v, dt);
+    c.m.rotation.x += dt * 6; c.m.rotation.y += dt * 4;
+    c.life -= dt;
+    if (c.life <= 0 || c.m.position.y < 0.05) c.m.visible = false;
+  });
+}
+
+function updateTags() {
+  if (!S || !renderer) return;
+  const on = S.phase === 'play' || S.phase === 'reveal';
+  const w = lastW, h = lastH;
+  const place = (el, pos) => {
+    el.style.display = on ? 'block' : 'none';
+    if (!on) return;
+    _v.copy(pos).project(camera);
+    el.style.left = (_v.x * 0.5 + 0.5) * w + 'px';
+    el.style.top = (-_v.y * 0.5 + 0.5) * h + 'px';
+  };
+  _v.set(S3.g.position.x, 2.1, S3.g.position.z);
+  place($('#tag-sh'), new V(S3.g.position.x, 2.1, S3.g.position.z));
+  place($('#tag-kp'), new V(K3.D.position.x, K3.D.position.y + 0.9, KZ));
+}
+
+let lastT = 0;
+function loop3D(now) {
+  requestAnimationFrame(loop3D);
+  if (!renderer || !$('#s-game').classList.contains('on')) { lastT = now; return; }
+  const dt = Math.min(0.05, (now - lastT) / 1000 || 0.016);
+  lastT = now;
+  const t = anim ? (now - anim.start) / 1000 : 0;
+  // Sahte "performance.now" farkını önlemek için anim.start ile aynı saat kullanılır
+  updateShooter(t);
+  updateKeeper(t, now);
+  updateBall(t, dt);
+  updateConfetti(dt);
+  ballShadow.position.set(ballM.position.x, 0.03, ballM.position.z);
+  const sc = 1 / (1 + Math.max(0, ballM.position.y - BR) * 0.7);
+  ballShadow.scale.set(sc, sc, sc);
+
+  const want = baseLook.clone();
+  if (anim && t > anim.tL) want.lerp(ballM.position, 0.22);
+  camLook.lerp(want, 0.08);
+  camShake *= 0.9;
+  camera.position.x = (Math.random() - 0.5) * camShake * 0.2;
+  camera.lookAt(camLook);
+  updateTags();
+  renderer.render(scene, camera);
+}
 
 /* ---------- Sesli sohbet (WebRTC, sadece ses) ---------- */
 const peers = {}, pend = {};
