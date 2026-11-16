@@ -273,7 +273,7 @@ const server = http.createServer(async (req, res) => {
       if (room.players.length < 2) return json(res, { error: 'En az 2 kişi gerekli' }, 400);
       room.players.forEach((x) => (x.score = 0));
       room.round = 0;
-      room.total = room.players.length * 2;
+      room.total = room.players.length * (room.players.length === 2 ? 5 : 2);
       startRound(room);
       return json(res, { ok: true });
     }
